@@ -3,61 +3,117 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Pencatatan Pengerjaan Bubut</title>
+  <title>Pencatatan Pengerjaan Bubut - Industrial Edition</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
     body { font-family: 'Inter', sans-serif; }
+
+    /* Animasi Industrial */
+    @keyframes spinSlow {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    @keyframes pulseGlow {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.6; transform: scale(1.05); }
+    }
+    @keyframes modalPop {
+      0% { opacity: 0; transform: scale(0.95); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+
+    .fa-spin-slow {
+      animation: spinSlow 12s linear infinite;
+    }
+    .status-pulse {
+      animation: pulseGlow 2s ease-in-out infinite;
+    }
+    .modal-animated {
+      animation: modalPop 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    /* Steel / Metallic Gradient Backgrounds */
+    .bg-industrial-gradient {
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
+    }
+    .bg-card-steel {
+      background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+    }
   </style>
 </head>
-<body class="bg-slate-100 min-h-screen flex flex-col justify-between text-slate-800">
+<body class="bg-slate-100 min-h-screen flex flex-col justify-between text-slate-800 antialiased">
 
   <div>
-    <header class="bg-indigo-600 text-white shadow-lg sticky top-0 z-50">
+    <!-- Industrial Header -->
+    <header class="bg-industrial-gradient text-white shadow-xl sticky top-0 z-40 border-b border-slate-700">
       <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
         <div class="flex items-center space-x-3">
-          <i class="fa-solid fa-gears text-2xl text-amber-400 mr-2"></i>
-          <h1 class="text-xl font-bold tracking-wide">Pencatatan Bengkel Bubut</h1>
+          <div class="relative flex items-center justify-center bg-amber-500/20 p-2.5 rounded-xl border border-amber-500/40 shadow-inner">
+            <i class="fa-solid fa-gear text-2xl text-amber-400 fa-spin-slow"></i>
+            <i class="fa-solid fa-wrench text-xs text-amber-200 absolute"></i>
+          </div>
+          <div>
+            <h1 class="text-xl font-extrabold tracking-wider uppercase bg-clip-text text-transparent bg-gradient-to-r from-amber-400 via-slate-100 to-indigo-200">
+              Bengkel Bubut System
+            </h1>
+            <p class="text-xs text-slate-400 font-medium">Monitoring & Recording Work Order</p>
+          </div>
         </div>
-        <button onclick="loadData()" class="bg-indigo-700 hover:bg-indigo-800 text-white px-3 py-1.5 rounded-lg text-sm transition flex items-center gap-2">
-          <i class="fa-solid fa-rotate" id="refresh-icon"></i> Refresh Data
+        <button onclick="loadData()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-xl text-sm font-semibold transition shadow-md hover:shadow-indigo-500/20 flex items-center gap-2 border border-indigo-400/30 active:scale-95">
+          <i class="fa-solid fa-rotate text-amber-400" id="refresh-icon"></i> 
+          <span>Refresh</span>
         </button>
       </div>
     </header>
 
-    <main class="max-w-7xl mx-auto px-4 py-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
-      <section class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-        <h2 class="text-lg font-semibold mb-4 text-indigo-900 border-b pb-2 flex items-center gap-2">
-          <i class="fa-solid fa-square-plus text-indigo-600"></i> Tambah SPK Baru
-        </h2>
+    <main class="max-w-7xl mx-auto px-4 py-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+      <!-- Form Input Section (4 Cols) -->
+      <section class="lg:col-span-4 bg-card-steel p-6 rounded-2xl shadow-sm border border-slate-200/80">
+        <div class="flex items-center justify-between mb-5 border-b pb-3 border-slate-200">
+          <h2 class="text-md font-bold text-slate-800 flex items-center gap-2 uppercase tracking-wide">
+            <i class="fa-solid fa-file-circle-plus text-indigo-600"></i> Input SPK Baru
+          </h2>
+          <span class="text-xs font-semibold px-2 py-0.5 bg-indigo-50 text-indigo-700 rounded border border-indigo-100">Form SPK</span>
+        </div>
         
         <form id="spkForm" onsubmit="submitForm(event)" class="space-y-4">
           <div>
-            <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">No SPK</label>
-            <input type="text" id="noSpk" required class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none text-sm" placeholder="Contoh: SPK-001">
+            <label class="block text-xs font-bold text-slate-600 uppercase mb-1">No SPK</label>
+            <div class="relative">
+              <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400"><i class="fa-solid fa-hashtag text-xs"></i></span>
+              <input type="text" id="noSpk" required class="w-full pl-9 pr-3 py-2 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm font-semibold text-slate-800" placeholder="SPK-001">
+            </div>
           </div>
 
           <div>
-            <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Nama Customer</label>
-            <input type="text" id="namaCostumer" required class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none text-sm" placeholder="Nama Pelanggan">
+            <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Nama Customer</label>
+            <div class="relative">
+              <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400"><i class="fa-solid fa-user-gear text-xs"></i></span>
+              <input type="text" id="namaCostumer" required class="w-full pl-9 pr-3 py-2 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 text-sm" placeholder="PT / CV / Perorangan">
+            </div>
           </div>
 
           <div>
-            <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Nama Barang</label>
-            <input type="text" id="namaBarang" required class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none text-sm" placeholder="Nama Komponen / Sparepart">
+            <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Nama Barang</label>
+            <div class="relative">
+              <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400"><i class="fa-solid fa-box-archive text-xs"></i></span>
+              <input type="text" id="namaBarang" required class="w-full pl-9 pr-3 py-2 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 text-sm" placeholder="Shaft / Flange / Gear / Dll">
+            </div>
           </div>
 
           <div>
-            <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Detail Pengerjaan</label>
-            <textarea id="pengerjaan" rows="2" required class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none text-sm" placeholder="Deskripsi perbaikan/pembuatan..."></textarea>
+            <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Detail Pengerjaan</label>
+            <textarea id="pengerjaan" rows="2" required class="w-full p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 text-sm resize-none" placeholder="Deskripsi spesifikasi pengerjaan..."></textarea>
           </div>
 
           <div>
-            <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Jumlah (QTY)</label>
+            <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Jumlah (QTY)</label>
             <div class="flex gap-2">
-              <input type="number" id="jumlahAngka" min="1" required class="w-2/3 px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none text-sm" placeholder="Jumlah">
-              <select id="satuanQty" required class="w-1/3 px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none text-sm bg-white font-semibold">
+              <input type="number" id="jumlahAngka" min="1" value="1" required class="w-2/3 px-3 py-2 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 text-sm font-semibold">
+              <select id="satuanQty" required class="w-1/3 px-3 py-2 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 text-sm bg-slate-50 font-bold text-slate-700">
                 <option value="PCS">PCS</option>
                 <option value="UNIT">UNIT</option>
                 <option value="SISI">SISI</option>
@@ -67,18 +123,18 @@
 
           <div class="grid grid-cols-2 gap-3">
             <div>
-              <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Tgl Masuk</label>
-              <input type="date" id="tanggalMasuk" required class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none text-sm">
+              <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Tgl Masuk</label>
+              <input type="date" id="tanggalMasuk" required class="w-full px-3 py-2 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 text-xs font-medium">
             </div>
             <div>
-              <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Tgl Keluar</label>
-              <input type="date" id="tanggalKeluar" class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none text-sm">
+              <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Tgl Keluar</label>
+              <input type="date" id="tanggalKeluar" class="w-full px-3 py-2 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 text-xs font-medium">
             </div>
           </div>
 
           <div>
-            <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Status Pengerjaan</label>
-            <select id="status" required class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none text-sm bg-white">
+            <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Status Pengerjaan</label>
+            <select id="status" required class="w-full px-3 py-2 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 text-sm bg-slate-50 font-semibold text-slate-800">
               <option value="ANTRIAN">ANTRIAN</option>
               <option value="PROSES BUBUT/LAS">PROSES BUBUT/LAS</option>
               <option value="SELESAI">SELESAI</option>
@@ -86,49 +142,135 @@
             </select>
           </div>
 
-          <button type="submit" id="btnSubmit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2.5 rounded-lg transition shadow-md flex justify-center items-center gap-2 text-sm">
-            <i class="fa-solid fa-paper-plane"></i> Simpan Data
+          <button type="submit" id="btnSubmit" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-3 rounded-xl transition duration-200 shadow-md hover:shadow-slate-900/30 flex justify-center items-center gap-2 text-sm active:scale-98">
+            <i class="fa-solid fa-floppy-disk text-amber-400"></i> Simpan Pengerjaan
           </button>
         </form>
       </section>
 
-      <section class="lg:col-span-2 bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4 border-b pb-3">
-          <h2 class="text-lg font-semibold text-indigo-900 flex items-center gap-2">
-            <i class="fa-solid fa-list-check text-indigo-600"></i> Daftar Pengerjaan
-          </h2>
-          <input type="text" id="searchInput" onkeyup="filterTable()" placeholder="Cari SPK / Customer / Barang..." class="px-3 py-1.5 border rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none w-full sm:w-64">
+      <!-- Table Section (8 Cols) -->
+      <section class="lg:col-span-8 bg-card-steel p-6 rounded-2xl shadow-sm border border-slate-200/80">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5 border-b pb-3 border-slate-200">
+          <div>
+            <h2 class="text-md font-bold text-slate-800 flex items-center gap-2 uppercase tracking-wide">
+              <i class="fa-solid fa-list-check text-indigo-600"></i> Daftar Work Order
+            </h2>
+            <p class="text-xs text-slate-500">Klik pada baris pengerjaan untuk melihat detail lengkap</p>
+          </div>
+          
+          <div class="relative">
+            <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400"><i class="fa-solid fa-magnifying-glass text-xs"></i></span>
+            <input type="text" id="searchInput" onkeyup="filterTable()" placeholder="Cari SPK / Customer / Barang..." class="pl-9 pr-3 py-2 border border-slate-300 rounded-xl text-xs focus:ring-2 focus:ring-indigo-500 w-full sm:w-64 bg-slate-50">
+          </div>
         </div>
 
-        <div class="overflow-x-auto">
+        <div class="overflow-x-auto rounded-xl border border-slate-200 shadow-inner">
           <table class="w-full text-left border-collapse">
             <thead>
-              <tr class="bg-slate-50 text-slate-500 text-xs font-bold uppercase tracking-wider border-b">
-                <th class="p-3">SPK & Customer</th>
-                <th class="p-3">Barang & Pengerjaan</th>
-                <th class="p-3">QTY</th>
-                <th class="p-3">Tanggal</th>
-                <th class="p-3">Status</th>
+              <tr class="bg-slate-900 text-slate-300 text-xs font-bold uppercase tracking-wider">
+                <th class="p-3.5">SPK & Customer</th>
+                <th class="p-3.5">Nama Barang</th>
+                <th class="p-3.5">QTY</th>
+                <th class="p-3.5">Status</th>
+                <th class="p-3.5 text-center">Aksi</th>
               </tr>
             </thead>
-            <tbody id="tableBody" class="divide-y divide-slate-100 text-sm">
+            <tbody id="tableBody" class="divide-y divide-slate-200 text-sm bg-white">
               <tr>
-                <td colspan="5" class="text-center py-8 text-slate-400">Memuat data...</td>
+                <td colspan="5" class="text-center py-10 text-slate-400">
+                  <i class="fa-solid fa-gear fa-spin-slow text-3xl text-indigo-400 mb-2 block"></i>
+                  Memuat data pengerjaan...
+                </td>
               </tr>
             </tbody>
           </table>
         </div>
       </section>
+
     </main>
   </div>
 
-  <footer class="bg-slate-900 text-slate-400 py-4 text-center text-xs font-semibold tracking-widest uppercase border-t border-slate-800">
+  <!-- POPUP MODAL DETAIL PENGERJAAN -->
+  <div id="detailModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-lg modal-animated overflow-hidden">
+      
+      <!-- Modal Header -->
+      <div class="bg-industrial-gradient text-white px-6 py-4 flex justify-between items-center border-b border-slate-700">
+        <div class="flex items-center gap-3">
+          <div class="bg-amber-400/20 p-2 rounded-lg border border-amber-400/40">
+            <i class="fa-solid fa-circle-info text-amber-400 text-lg"></i>
+          </div>
+          <div>
+            <h3 class="text-base font-bold text-slate-100" id="modalSpk">SPK-000</h3>
+            <p class="text-xs text-slate-400" id="modalCustomer">Customer Name</p>
+          </div>
+        </div>
+        <button onclick="closeModal()" class="text-slate-400 hover:text-white text-lg w-8 h-8 rounded-full flex items-center justify-center hover:bg-slate-800 transition">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <!-- Modal Body -->
+      <div class="p-6 space-y-4">
+        <div class="grid grid-cols-2 gap-4 bg-slate-50 p-4 rounded-xl border border-slate-200">
+          <div>
+            <span class="text-xs font-bold text-slate-400 uppercase block mb-1">Nama Barang</span>
+            <span class="text-sm font-bold text-slate-800 block" id="modalBarang">-</span>
+          </div>
+          <div>
+            <span class="text-xs font-bold text-slate-400 uppercase block mb-1">Jumlah (QTY)</span>
+            <span class="inline-block bg-indigo-50 text-indigo-700 border border-indigo-200 font-extrabold text-xs px-2.5 py-1 rounded-lg" id="modalQty">-</span>
+          </div>
+        </div>
+
+        <div>
+          <span class="text-xs font-bold text-slate-400 uppercase block mb-1">Detail Pengerjaan</span>
+          <p class="text-sm text-slate-700 bg-slate-50 p-3 rounded-xl border border-slate-200 whitespace-pre-line" id="modalPengerjaan">-</p>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+          <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+            <span class="text-xs font-bold text-slate-400 uppercase block mb-0.5"><i class="fa-solid fa-calendar-check text-emerald-600 mr-1"></i> Tgl Masuk</span>
+            <span class="text-xs font-semibold text-slate-800" id="modalTglMasuk">-</span>
+          </div>
+          <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+            <span class="text-xs font-bold text-slate-400 uppercase block mb-0.5"><i class="fa-solid fa-calendar-xmark text-amber-600 mr-1"></i> Tgl Keluar</span>
+            <span class="text-xs font-semibold text-slate-800" id="modalTglKeluar">-</span>
+          </div>
+        </div>
+
+        <!-- Status Update Inside Modal -->
+        <div class="pt-2">
+          <label class="block text-xs font-bold text-slate-600 uppercase mb-1.5">Ubah Status Pengerjaan</label>
+          <select id="modalStatusSelect" onchange="updateStatusFromModal()" class="w-full px-3 py-2.5 border border-slate-300 rounded-xl text-xs font-bold bg-white focus:ring-2 focus:ring-indigo-500 shadow-sm">
+            <option value="ANTRIAN">ANTRIAN</option>
+            <option value="PROSES BUBUT/LAS">PROSES BUBUT/LAS</option>
+            <option value="SELESAI">SELESAI</option>
+            <option value="DIAMBIL">DIAMBIL</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="bg-slate-50 px-6 py-3 border-t border-slate-200 flex justify-between items-center text-xs text-slate-500">
+        <span class="flex items-center gap-1"><i class="fa-solid fa-screwdriver-wrench text-slate-400"></i> Auto-Sync Google Sheet</span>
+        <button onclick="closeModal()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold px-4 py-2 rounded-xl transition">
+          Tutup
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Footer Credit -->
+  <footer class="bg-industrial-gradient text-slate-400 py-4 text-center text-xs font-semibold tracking-widest uppercase border-t border-slate-800 shadow-inner">
     DESAIN WEB BY : AMY
   </footer>
 
   <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzHCYUjUf84P4TFSVUV9ZjM4pVaCTyTyn7QcNLYOWfMVyWaPS0DRjo3pMpUft8oJjIjAA/exec";
+    const SCRIPT_URL = "GANTI_DENGAN_URL_WEB_APP_KAMU";
     let globalData = [];
+    let selectedRowIndex = null;
 
     document.addEventListener('DOMContentLoaded', () => {
       document.getElementById('tanggalMasuk').value = new Date().toISOString().split('T')[0];
@@ -137,73 +279,104 @@
 
     function loadData() {
       const icon = document.getElementById('refresh-icon');
-      if (icon) icon.classList.add('fa-spin');
+      if (icon) icon.classList.add('fa-spin-slow');
 
       fetch(SCRIPT_URL)
         .then(res => res.json())
         .then(data => {
           globalData = data;
           renderTable(data);
-          if (icon) icon.classList.remove('fa-spin');
+          if (icon) icon.classList.remove('fa-spin-slow');
         })
         .catch(err => {
           alert('Gagal memuat data: ' + err);
-          if (icon) icon.classList.remove('fa-spin');
+          if (icon) icon.classList.remove('fa-spin-slow');
         });
     }
 
     function renderTable(data) {
       const tbody = document.getElementById('tableBody');
       if (!data || data.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="5" class="text-center py-8 text-slate-400">Belum ada data pengerjaan.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="5" class="text-center py-10 text-slate-400 font-medium">Belum ada data pengerjaan.</td></tr>`;
         return;
       }
 
       tbody.innerHTML = data.map(item => `
-        <tr class="hover:bg-slate-50 transition">
-          <td class="p-3 align-top">
-            <span class="font-bold text-indigo-600 block">${item.noSpk}</span>
-            <span class="text-slate-700 font-medium">${item.namaCostumer}</span>
+        <tr onclick="openModal(${item.rowIndex})" class="hover:bg-indigo-50/60 cursor-pointer transition duration-150 border-b border-slate-100 group">
+          <td class="p-3.5 align-middle">
+            <span class="font-extrabold text-indigo-600 block group-hover:text-indigo-800">${item.noSpk}</span>
+            <span class="text-xs text-slate-600 font-semibold">${item.namaCostumer}</span>
           </td>
-          <td class="p-3 align-top">
-            <span class="font-semibold text-slate-800 block">${item.namaBarang}</span>
-            <span class="text-xs text-slate-500 whitespace-pre-line">${item.pengerjaan}</span>
+          <td class="p-3.5 align-middle">
+            <span class="font-bold text-slate-800 block text-xs">${item.namaBarang}</span>
+            <span class="text-[11px] text-slate-400 truncate max-w-[150px] block">${item.pengerjaan}</span>
           </td>
-          <td class="p-3 align-top font-semibold text-slate-700 whitespace-nowrap">
-            <span class="bg-slate-100 border border-slate-200 px-2 py-0.5 rounded text-xs">${item.jumlahQty || '-'}</span>
+          <td class="p-3.5 align-middle">
+            <span class="bg-slate-100 text-slate-700 font-bold px-2 py-0.5 rounded text-xs border border-slate-200">${item.jumlahQty || '-'}</span>
           </td>
-          <td class="p-3 align-top text-xs space-y-1 whitespace-nowrap">
-            <div><b class="text-slate-400">Masuk:</b> ${item.tanggalMasuk || '-'}</div>
-            <div><b class="text-slate-400">Keluar:</b> ${item.tanggalKeluar || '-'}</div>
+          <td class="p-3.5 align-middle">
+            ${getStatusBadgeHtml(item.status)}
           </td>
-          <td class="p-3 align-top">
-            <select onchange="changeStatus(${item.rowIndex}, this.value)" class="text-xs font-bold px-2 py-1 rounded-full border border-transparent transition cursor-pointer ${getStatusStyle(item.status)}">
-              <option value="ANTRIAN" ${item.status === 'ANTRIAN' ? 'selected' : ''}>ANTRIAN</option>
-              <option value="PROSES BUBUT/LAS" ${item.status === 'PROSES BUBUT/LAS' ? 'selected' : ''}>PROSES BUBUT/LAS</option>
-              <option value="SELESAI" ${item.status === 'SELESAI' ? 'selected' : ''}>SELESAI</option>
-              <option value="DIAMBIL" ${item.status === 'DIAMBIL' ? 'selected' : ''}>DIAMBIL</option>
-            </select>
+          <td class="p-3.5 align-middle text-center">
+            <button onclick="event.stopPropagation(); openModal(${item.rowIndex})" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-600 p-2 rounded-xl transition text-xs font-semibold">
+              <i class="fa-solid fa-eye"></i> Detail
+            </button>
           </td>
         </tr>
       `).join('');
     }
 
-    function getStatusStyle(status) {
+    function getStatusBadgeHtml(status) {
       switch (status) {
-        case 'ANTRIAN': return 'bg-amber-100 text-amber-800 border-amber-200';
-        case 'PROSES BUBUT/LAS': return 'bg-blue-100 text-blue-800 border-blue-200';
-        case 'SELESAI': return 'bg-emerald-100 text-emerald-800 border-emerald-200';
-        case 'DIAMBIL': return 'bg-slate-200 text-slate-700 border-slate-300';
-        default: return 'bg-slate-100 text-slate-600';
+        case 'ANTRIAN':
+          return `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800 border border-amber-200"><i class="fa-solid fa-clock text-[10px]"></i> ANTRIAN</span>`;
+        case 'PROSES BUBUT/LAS':
+          return `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-blue-100 text-blue-800 border border-blue-200 status-pulse"><i class="fa-solid fa-gears text-[10px] fa-spin-slow"></i> PROSES BUBUT/LAS</span>`;
+        case 'SELESAI':
+          return `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-200"><i class="fa-solid fa-circle-check text-[10px]"></i> SELESAI</span>`;
+        case 'DIAMBIL':
+          return `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-slate-200 text-slate-700 border border-slate-300"><i class="fa-solid fa-box-open text-[10px]"></i> DIAMBIL</span>`;
+        default:
+          return `<span class="px-2.5 py-1 rounded-full text-xs font-bold bg-slate-100 text-slate-600">${status}</span>`;
       }
     }
 
-    function changeStatus(rowIndex, newStatus) {
+    function openModal(rowIndex) {
+      const item = globalData.find(d => d.rowIndex === rowIndex);
+      if (!item) return;
+
+      selectedRowIndex = rowIndex;
+      document.getElementById('modalSpk').innerText = item.noSpk;
+      document.getElementById('modalCustomer').innerText = item.namaCostumer;
+      document.getElementById('modalBarang').innerText = item.namaBarang;
+      document.getElementById('modalQty').innerText = item.jumlahQty || '-';
+      document.getElementById('modalPengerjaan').innerText = item.pengerjaan;
+      document.getElementById('modalTglMasuk').innerText = item.tanggalMasuk || '-';
+      document.getElementById('modalTglKeluar').innerText = item.tanggalKeluar || '-';
+      
+      const statusSelect = document.getElementById('modalStatusSelect');
+      statusSelect.value = item.status;
+
+      document.getElementById('detailModal').classList.remove('hidden');
+    }
+
+    function closeModal() {
+      document.getElementById('detailModal').classList.add('hidden');
+      selectedRowIndex = null;
+    }
+
+    function updateStatusFromModal() {
+      if (!selectedRowIndex) return;
+      const newStatus = document.getElementById('modalStatusSelect').value;
+
       fetch(SCRIPT_URL, {
         method: 'POST',
-        body: JSON.stringify({ action: 'updateStatus', rowIndex: rowIndex, newStatus: newStatus })
+        body: JSON.stringify({ action: 'updateStatus', rowIndex: selectedRowIndex, newStatus: newStatus })
       })
-      .then(() => loadData());
+      .then(() => {
+        closeModal();
+        loadData();
+      });
     }
 
     function submitForm(e) {
@@ -233,7 +406,7 @@
         document.getElementById('spkForm').reset();
         document.getElementById('tanggalMasuk').value = new Date().toISOString().split('T')[0];
         btn.disabled = false;
-        btn.innerHTML = `<i class="fa-solid fa-paper-plane"></i> Simpan Data`;
+        btn.innerHTML = `<i class="fa-solid fa-floppy-disk text-amber-400"></i> Simpan Pengerjaan`;
         loadData();
       });
     }
