@@ -136,13 +136,14 @@
               <option value="ANTRIAN">ANTRIAN</option>
               <option value="PROSES BUBUT/LAS">PROSES BUBUT/LAS</option>
               <option value="SELESAI">SELESAI</option>
+              <option value="DIKIRIM">DIKIRIM</option>
               <option value="DIAMBIL">DIAMBIL</option>
             </select>
           </div>
 
           <div>
             <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Keterangan Tambahan</label>
-            <input type="text" id="keterangan" class="w-full px-3 py-2 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 text-sm" placeholder="Contoh: Tinggal finishing / Tunggu bahan">
+            <input type="text" id="keterangan" class="w-full px-3 py-2 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 text-sm" placeholder="Contoh: Dalam perjalanan ekspedisi / Tinggal finishing">
           </div>
 
           <button type="submit" id="btnSubmit" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-3 rounded-xl transition duration-200 shadow-md flex justify-center items-center gap-2 text-sm active:scale-98">
@@ -247,6 +248,7 @@
               <option value="ANTRIAN">ANTRIAN</option>
               <option value="PROSES BUBUT/LAS">PROSES BUBUT/LAS</option>
               <option value="SELESAI">SELESAI</option>
+              <option value="DIKIRIM">DIKIRIM</option>
               <option value="DIAMBIL">DIAMBIL</option>
             </select>
           </div>
@@ -349,6 +351,8 @@
           return `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-blue-100 text-blue-800 border border-blue-200 status-pulse"><i class="fa-solid fa-gears text-[10px] fa-spin-slow"></i> PROSES BUBUT/LAS</span>`;
         case 'SELESAI':
           return `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-200"><i class="fa-solid fa-circle-check text-[10px]"></i> SELESAI</span>`;
+        case 'DIKIRIM':
+          return `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-purple-100 text-purple-800 border border-purple-200"><i class="fa-solid fa-truck-fast text-[10px]"></i> DIKIRIM</span>`;
         case 'DIAMBIL':
           return `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-slate-200 text-slate-700 border border-slate-300"><i class="fa-solid fa-box-open text-[10px]"></i> DIAMBIL</span>`;
         default:
