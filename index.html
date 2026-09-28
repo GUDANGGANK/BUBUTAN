@@ -159,7 +159,7 @@
             <h2 class="text-md font-bold text-slate-800 flex items-center gap-2 uppercase tracking-wide">
               <i class="fa-solid fa-list-check text-indigo-600"></i> Daftar Work Order
             </h2>
-            <p class="text-xs text-slate-500">Klik baris pengerjaan untuk melihat/mengubah detail & keterangan</p>
+            <p class="text-xs text-slate-500">Klik baris pengerjaan untuk melihat/mengubah detail atau menghapus data</p>
           </div>
           
           <div class="relative">
@@ -258,9 +258,14 @@
             <input type="text" id="modalKeteranganInput" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs font-semibold focus:ring-2 focus:ring-indigo-500" placeholder="Tuliskan posisi/proses pengerjaan saat ini...">
           </div>
 
-          <button onclick="updateDetailFromModal()" id="btnUpdateModal" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 rounded-xl text-xs transition flex justify-center items-center gap-2">
-            <i class="fa-solid fa-arrows-rotate"></i> Update Status & Keterangan
-          </button>
+          <div class="grid grid-cols-2 gap-2 pt-1">
+            <button onclick="updateDetailFromModal()" id="btnUpdateModal" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 rounded-xl text-xs transition flex justify-center items-center gap-1.5">
+              <i class="fa-solid fa-arrows-rotate"></i> Simpan Perubahan
+            </button>
+            <button onclick="deleteRecord(selectedRowIndex)" id="btnDeleteModal" class="bg-rose-600 hover:bg-rose-700 text-white font-bold py-2.5 rounded-xl text-xs transition flex justify-center items-center gap-1.5">
+              <i class="fa-solid fa-trash-can"></i> Hapus SPK Ini
+            </button>
+          </div>
         </div>
       </div>
 
@@ -280,7 +285,7 @@
   </footer>
 
   <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyztJSv2J6W7y1lJ3mrM1B5X0hd_uHHcu8g1kFrvugwc6HCv75sIuWk_GZ4YiF6IPzztQ/exec";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwVP06AoLONjXagshIwMCKLabdQkEWTYmHm17SckznDLCZkT5n4l3TkNZWgQ0JJwJkbHg/exec";
     let globalData = [];
     let selectedRowIndex = null;
 
@@ -335,9 +340,14 @@
             </span>
           </td>
           <td class="p-3.5 align-middle text-center">
-            <button onclick="event.stopPropagation(); openModal(${item.rowIndex})" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-600 p-2 rounded-xl transition text-xs font-semibold">
-              <i class="fa-solid fa-eye"></i> Detail
-            </button>
+            <div class="flex items-center justify-center gap-1">
+              <button onclick="event.stopPropagation(); openModal(${item.rowIndex})" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-600 p-2 rounded-xl transition text-xs font-semibold" title="Lihat Detail">
+                <i class="fa-solid fa-eye"></i>
+              </button>
+              <button onclick="event.stopPropagation(); deleteRecord(${item.rowIndex})" class="bg-rose-50 hover:bg-rose-100 text-rose-600 p-2 rounded-xl transition text-xs font-semibold" title="Hapus SPK">
+                <i class="fa-solid fa-trash-can"></i>
+              </button>
+            </div>
           </td>
         </tr>
       `).join('');
@@ -404,7 +414,29 @@
       })
       .then(() => {
         btn.disabled = false;
-        btn.innerHTML = `<i class="fa-solid fa-arrows-rotate"></i> Update Status & Keterangan`;
+        btn.innerHTML = `<i class="fa-solid fa-arrows-rotate"></i> Simpan Perubahan`;
+        closeModal();
+        loadData();
+      });
+    }
+
+    function deleteRecord(rowIndex) {
+      if (!rowIndex) return;
+      const item = globalData.find(d => d.rowIndex === rowIndex);
+      const spkName = item ? item.noSpk : 'ini';
+
+      if (!confirm(`Apakah Anda yakin ingin menghapus data ${spkName}? Data di Google Sheet juga akan terhapus secara permanen.`)) {
+        return;
+      }
+
+      fetch(SCRIPT_URL, {
+        method: 'POST',
+        body: JSON.stringify({
+          action: 'delete',
+          rowIndex: rowIndex
+        })
+      })
+      .then(() => {
         closeModal();
         loadData();
       });
