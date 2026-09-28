@@ -69,7 +69,7 @@
     <main class="max-w-7xl mx-auto px-4 py-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
 
       <!-- Form Input Section -->
-      <section class="lg:col-span-4 bg-card-steel p-6 rounded-2xl shadow-sm border border-slate-200/80">
+      <section class="lg:col-span-4 bg-card-steel p-6 rounded-2xl shadow-sm border border-slate-200/80 h-fit">
         <div class="flex items-center justify-between mb-5 border-b pb-3 border-slate-200">
           <h2 class="text-md font-bold text-slate-800 flex items-center gap-2 uppercase tracking-wide">
             <i class="fa-solid fa-file-circle-plus text-indigo-600"></i> Input SPK Baru
@@ -154,17 +154,25 @@
 
       <!-- Table Section -->
       <section class="lg:col-span-8 bg-card-steel p-6 rounded-2xl shadow-sm border border-slate-200/80">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5 border-b pb-3 border-slate-200">
-          <div>
-            <h2 class="text-md font-bold text-slate-800 flex items-center gap-2 uppercase tracking-wide">
-              <i class="fa-solid fa-list-check text-indigo-600"></i> Daftar Work Order
-            </h2>
-            <p class="text-xs text-slate-500">Klik baris pengerjaan untuk melihat/mengubah detail atau menghapus data</p>
+        
+        <!-- Tab Navigation & Filter -->
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5 border-b pb-4 border-slate-200">
+          <div class="flex bg-slate-200/70 p-1 rounded-xl gap-1">
+            <button onclick="switchTab('active')" id="tabActiveBtn" class="px-4 py-2 rounded-lg text-xs font-extrabold transition flex items-center gap-2 bg-white text-indigo-600 shadow-sm">
+              <i class="fa-solid fa-gears"></i>
+              <span>Pengerjaan Aktif</span>
+              <span id="activeCountBadge" class="bg-indigo-600 text-white text-[10px] px-2 py-0.5 rounded-full">0</span>
+            </button>
+            <button onclick="switchTab('history')" id="tabHistoryBtn" class="px-4 py-2 rounded-lg text-xs font-extrabold transition flex items-center gap-2 text-slate-600 hover:text-slate-900">
+              <i class="fa-solid fa-clock-rotate-left"></i>
+              <span>Riwayat Selesai</span>
+              <span id="historyCountBadge" class="bg-slate-400 text-white text-[10px] px-2 py-0.5 rounded-full">0</span>
+            </button>
           </div>
-          
+
           <div class="relative">
             <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400"><i class="fa-solid fa-magnifying-glass text-xs"></i></span>
-            <input type="text" id="searchInput" onkeyup="filterTable()" placeholder="Cari SPK / Customer / Barang..." class="pl-9 pr-3 py-2 border border-slate-300 rounded-xl text-xs focus:ring-2 focus:ring-indigo-500 w-full sm:w-64 bg-slate-50">
+            <input type="text" id="searchInput" onkeyup="filterTable()" placeholder="Cari SPK / Customer / Barang..." class="pl-9 pr-3 py-2 border border-slate-300 rounded-xl text-xs focus:ring-2 focus:ring-indigo-500 w-full sm:w-56 bg-slate-50">
           </div>
         </div>
 
@@ -285,8 +293,9 @@
   </footer>
 
   <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwVP06AoLONjXagshIwMCKLabdQkEWTYmHm17SckznDLCZkT5n4l3TkNZWgQ0JJwJkbHg/exec";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbygpijCx2Oj_WDMeyJWv21pwQY9-rH1ghxrOfQtxBDVmiiPchvRPqtQVwsATPczjoXE3A/exec";
     let globalData = [];
+    let currentTab = 'active'; // 'active' atau 'history'
     let selectedRowIndex = null;
 
     document.addEventListener('DOMContentLoaded', () => {
@@ -305,7 +314,8 @@
         })
         .then(data => {
           globalData = data;
-          renderTable(data);
+          updateCounts();
+          filterTable();
           if (icon) icon.classList.remove('fa-spin-slow');
         })
         .catch(err => {
@@ -314,10 +324,35 @@
         });
     }
 
+    function switchTab(tab) {
+      currentTab = tab;
+      const activeBtn = document.getElementById('tabActiveBtn');
+      const historyBtn = document.getElementById('tabHistoryBtn');
+
+      if (tab === 'active') {
+        activeBtn.className = "px-4 py-2 rounded-lg text-xs font-extrabold transition flex items-center gap-2 bg-white text-indigo-600 shadow-sm";
+        historyBtn.className = "px-4 py-2 rounded-lg text-xs font-extrabold transition flex items-center gap-2 text-slate-600 hover:text-slate-900";
+      } else {
+        historyBtn.className = "px-4 py-2 rounded-lg text-xs font-extrabold transition flex items-center gap-2 bg-white text-indigo-600 shadow-sm";
+        activeBtn.className = "px-4 py-2 rounded-lg text-xs font-extrabold transition flex items-center gap-2 text-slate-600 hover:text-slate-900";
+      }
+
+      filterTable();
+    }
+
+    function updateCounts() {
+      const activeData = globalData.filter(d => d.status === 'ANTRIAN' || d.status === 'PROSES BUBUT/LAS');
+      const historyData = globalData.filter(d => d.status === 'SELESAI' || d.status === 'DIKIRIM' || d.status === 'DIAMBIL');
+
+      document.getElementById('activeCountBadge').innerText = activeData.length;
+      document.getElementById('historyCountBadge').innerText = historyData.length;
+    }
+
     function renderTable(data) {
       const tbody = document.getElementById('tableBody');
       if (!data || data.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="5" class="text-center py-10 text-slate-400 font-medium">Belum ada data pengerjaan.</td></tr>`;
+        const msg = currentTab === 'active' ? 'Tidak ada pengerjaan aktif dalam antrian.' : 'Belum ada riwayat pengerjaan selesai.';
+        tbody.innerHTML = `<tr><td colspan="5" class="text-center py-10 text-slate-400 font-medium">${msg}</td></tr>`;
         return;
       }
 
@@ -477,13 +512,23 @@
 
     function filterTable() {
       const query = document.getElementById('searchInput').value.toLowerCase();
-      const filtered = globalData.filter(item => 
+      
+      const filteredByTab = globalData.filter(item => {
+        if (currentTab === 'active') {
+          return item.status === 'ANTRIAN' || item.status === 'PROSES BUBUT/LAS';
+        } else {
+          return item.status === 'SELESAI' || item.status === 'DIKIRIM' || item.status === 'DIAMBIL';
+        }
+      });
+
+      const finalFiltered = filteredByTab.filter(item => 
         item.noSpk.toString().toLowerCase().includes(query) ||
         item.namaCostumer.toLowerCase().includes(query) ||
         item.namaBarang.toLowerCase().includes(query) ||
         (item.keterangan && item.keterangan.toLowerCase().includes(query))
       );
-      renderTable(filtered);
+
+      renderTable(finalFiltered);
     }
   </script>
 </body>
