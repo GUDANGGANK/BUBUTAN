@@ -6,6 +6,12 @@
   <title>DODOH JAYA TEKNIK - Monitoring & recording Work Order</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  
+  <!-- Library untuk Export XLSX & PDF -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
     body { font-family: 'Inter', sans-serif; }
@@ -155,24 +161,52 @@
       <!-- Table Section -->
       <section class="lg:col-span-8 bg-card-steel p-6 rounded-2xl shadow-sm border border-slate-200/80">
         
-        <!-- Tab Navigation & Filter -->
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5 border-b pb-4 border-slate-200">
+        <!-- Tab Navigation, Export & Filter -->
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 mb-5 border-b pb-4 border-slate-200">
           <div class="flex bg-slate-200/70 p-1 rounded-xl gap-1">
-            <button onclick="switchTab('active')" id="tabActiveBtn" class="px-4 py-2 rounded-lg text-xs font-extrabold transition flex items-center gap-2 bg-white text-indigo-600 shadow-sm">
+            <button onclick="switchTab('active')" id="tabActiveBtn" class="px-3.5 py-2 rounded-lg text-xs font-extrabold transition flex items-center gap-2 bg-white text-indigo-600 shadow-sm">
               <i class="fa-solid fa-gears"></i>
               <span>Pengerjaan Aktif</span>
               <span id="activeCountBadge" class="bg-indigo-600 text-white text-[10px] px-2 py-0.5 rounded-full">0</span>
             </button>
-            <button onclick="switchTab('history')" id="tabHistoryBtn" class="px-4 py-2 rounded-lg text-xs font-extrabold transition flex items-center gap-2 text-slate-600 hover:text-slate-900">
+            <button onclick="switchTab('history')" id="tabHistoryBtn" class="px-3.5 py-2 rounded-lg text-xs font-extrabold transition flex items-center gap-2 text-slate-600 hover:text-slate-900">
               <i class="fa-solid fa-clock-rotate-left"></i>
               <span>Riwayat Selesai</span>
               <span id="historyCountBadge" class="bg-slate-400 text-white text-[10px] px-2 py-0.5 rounded-full">0</span>
             </button>
           </div>
 
-          <div class="relative">
-            <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400"><i class="fa-solid fa-magnifying-glass text-xs"></i></span>
-            <input type="text" id="searchInput" onkeyup="filterTable()" placeholder="Cari SPK / Customer / Barang..." class="pl-9 pr-3 py-2 border border-slate-300 rounded-xl text-xs focus:ring-2 focus:ring-indigo-500 w-full sm:w-56 bg-slate-50">
+          <div class="flex items-center gap-2 w-full md:w-auto">
+            <!-- Dropdown Download/Export Laporan -->
+            <div class="relative inline-block text-left">
+              <button onclick="toggleExportMenu()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-sm active:scale-95">
+                <i class="fa-solid fa-file-arrow-down text-amber-300"></i>
+                <span>Export Laporan</span>
+                <i class="fa-solid fa-chevron-down text-[10px] ml-0.5"></i>
+              </button>
+              
+              <div id="exportDropdown" class="hidden absolute right-0 mt-2 w-44 bg-white rounded-xl shadow-xl border border-slate-200 z-50 overflow-hidden text-xs">
+                <div class="px-3 py-2 bg-slate-50 border-b font-extrabold text-slate-500 uppercase text-[10px]">Pilih Format File</div>
+                <button onclick="exportPDF()" class="w-full text-left px-3.5 py-2.5 hover:bg-slate-100 flex items-center gap-2 font-bold text-slate-700 border-b border-slate-100">
+                  <i class="fa-solid fa-file-pdf text-rose-600 text-sm"></i> Download PDF
+                </button>
+                <button onclick="exportXLSX()" class="w-full text-left px-3.5 py-2.5 hover:bg-slate-100 flex items-center gap-2 font-bold text-slate-700 border-b border-slate-100">
+                  <i class="fa-solid fa-file-excel text-emerald-600 text-sm"></i> Download Excel (.xlsx)
+                </button>
+                <button onclick="exportCSV()" class="w-full text-left px-3.5 py-2.5 hover:bg-slate-100 flex items-center gap-2 font-bold text-slate-700 border-b border-slate-100">
+                  <i class="fa-solid fa-file-csv text-blue-600 text-sm"></i> Download CSV (.csv)
+                </button>
+                <button onclick="exportDOC()" class="w-full text-left px-3.5 py-2.5 hover:bg-slate-100 flex items-center gap-2 font-bold text-slate-700">
+                  <i class="fa-solid fa-file-word text-indigo-600 text-sm"></i> Download Word (.doc)
+                </button>
+              </div>
+            </div>
+
+            <!-- Search Bar -->
+            <div class="relative flex-grow md:flex-grow-0">
+              <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400"><i class="fa-solid fa-magnifying-glass text-xs"></i></span>
+              <input type="text" id="searchInput" onkeyup="filterTable()" placeholder="Cari SPK / Customer..." class="pl-9 pr-3 py-2 border border-slate-300 rounded-xl text-xs focus:ring-2 focus:ring-indigo-500 w-full md:w-48 bg-slate-50">
+            </div>
           </div>
         </div>
 
@@ -293,14 +327,23 @@
   </footer>
 
   <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbygpijCx2Oj_WDMeyJWv21pwQY9-rH1ghxrOfQtxBDVmiiPchvRPqtQVwsATPczjoXE3A/exec";
+    const SCRIPT_URL = "GANTI_DENGAN_URL_WEB_APP_KAMU";
     let globalData = [];
-    let currentTab = 'active'; // 'active' atau 'history'
+    let currentDisplayedData = [];
+    let currentTab = 'active';
     let selectedRowIndex = null;
 
     document.addEventListener('DOMContentLoaded', () => {
       document.getElementById('tanggalMasuk').value = new Date().toISOString().split('T')[0];
       loadData();
+      
+      // Tutup dropdown export jika klik di luar
+      document.addEventListener('click', (e) => {
+        const dropdown = document.getElementById('exportDropdown');
+        if (!e.target.closest('.relative.inline-block')) {
+          dropdown.classList.add('hidden');
+        }
+      });
     });
 
     function loadData() {
@@ -330,11 +373,11 @@
       const historyBtn = document.getElementById('tabHistoryBtn');
 
       if (tab === 'active') {
-        activeBtn.className = "px-4 py-2 rounded-lg text-xs font-extrabold transition flex items-center gap-2 bg-white text-indigo-600 shadow-sm";
-        historyBtn.className = "px-4 py-2 rounded-lg text-xs font-extrabold transition flex items-center gap-2 text-slate-600 hover:text-slate-900";
+        activeBtn.className = "px-3.5 py-2 rounded-lg text-xs font-extrabold transition flex items-center gap-2 bg-white text-indigo-600 shadow-sm";
+        historyBtn.className = "px-3.5 py-2 rounded-lg text-xs font-extrabold transition flex items-center gap-2 text-slate-600 hover:text-slate-900";
       } else {
-        historyBtn.className = "px-4 py-2 rounded-lg text-xs font-extrabold transition flex items-center gap-2 bg-white text-indigo-600 shadow-sm";
-        activeBtn.className = "px-4 py-2 rounded-lg text-xs font-extrabold transition flex items-center gap-2 text-slate-600 hover:text-slate-900";
+        historyBtn.className = "px-3.5 py-2 rounded-lg text-xs font-extrabold transition flex items-center gap-2 bg-white text-indigo-600 shadow-sm";
+        activeBtn.className = "px-3.5 py-2 rounded-lg text-xs font-extrabold transition flex items-center gap-2 text-slate-600 hover:text-slate-900";
       }
 
       filterTable();
@@ -521,14 +564,179 @@
         }
       });
 
-      const finalFiltered = filteredByTab.filter(item => 
+      currentDisplayedData = filteredByTab.filter(item => 
         item.noSpk.toString().toLowerCase().includes(query) ||
         item.namaCostumer.toLowerCase().includes(query) ||
         item.namaBarang.toLowerCase().includes(query) ||
         (item.keterangan && item.keterangan.toLowerCase().includes(query))
       );
 
-      renderTable(finalFiltered);
+      renderTable(currentDisplayedData);
+    }
+
+    // ================= EXPORT FUNCTIONS =================
+
+    function toggleExportMenu() {
+      const dropdown = document.getElementById('exportDropdown');
+      dropdown.classList.toggle('hidden');
+    }
+
+    function getTodayFormatted() {
+      const today = new Date();
+      return `${today.getDate()}-${today.getMonth() + 1}-${today.getFullYear()}`;
+    }
+
+    function exportPDF() {
+      toggleExportMenu();
+      if (!currentDisplayedData || currentDisplayedData.length === 0) {
+        alert('Tidak ada data untuk diunduh.');
+        return;
+      }
+
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF({ orientation: 'landscape' });
+
+      doc.setFontSize(14);
+      doc.text("DODOH JAYA TEKNIK - LAPORAN WORK ORDER", 14, 15);
+      doc.setFontSize(10);
+      doc.text(`Tanggal Cetak: ${new Date().toLocaleDateString('id-ID')} | Status: ${currentTab === 'active' ? 'Pengerjaan Aktif' : 'Riwayat Selesai'}`, 14, 22);
+
+      const tableColumn = ["NO SPK", "CUSTOMER", "NAMA BARANG", "PENGERJAAN", "QTY", "TGL MASUK", "TGL KELUAR", "STATUS", "KETERANGAN"];
+      const tableRows = currentDisplayedData.map(row => [
+        row.noSpk,
+        row.namaCostumer,
+        row.namaBarang,
+        row.pengerjaan,
+        row.jumlahQty || '-',
+        row.tanggalMasuk || '-',
+        row.tanggalKeluar || '-',
+        row.status,
+        row.keterangan || '-'
+      ]);
+
+      doc.autoTable({
+        head: [tableColumn],
+        body: tableRows,
+        startY: 28,
+        styles: { fontSize: 8 },
+        headStyles: { fillColor: [15, 23, 42] }
+      });
+
+      doc.save(`Laporan_Bubut_${currentTab}_${getTodayFormatted()}.pdf`);
+    }
+
+    function exportXLSX() {
+      toggleExportMenu();
+      if (!currentDisplayedData || currentDisplayedData.length === 0) {
+        alert('Tidak ada data untuk diunduh.');
+        return;
+      }
+
+      const formattedData = currentDisplayedData.map(row => ({
+        'NO SPK': row.noSpk,
+        'NAMA CUSTOMER': row.namaCostumer,
+        'NAMA BARANG': row.namaBarang,
+        'PENGERJAAN': row.pengerjaan,
+        'JUMLAH (QTY)': row.jumlahQty || '-',
+        'TANGGAL MASUK': row.tanggalMasuk || '-',
+        'TANGGAL KELUAR': row.tanggalKeluar || '-',
+        'STATUS': row.status,
+        'KETERANGAN': row.keterangan || '-'
+      }));
+
+      const worksheet = XLSX.utils.json_to_sheet(formattedData);
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, "Laporan Work Order");
+      XLSX.writeFile(workbook, `Laporan_Bubut_${currentTab}_${getTodayFormatted()}.xlsx`);
+    }
+
+    function exportCSV() {
+      toggleExportMenu();
+      if (!currentDisplayedData || currentDisplayedData.length === 0) {
+        alert('Tidak ada data untuk diunduh.');
+        return;
+      }
+
+      let csv = 'NO SPK,NAMA CUSTOMER,NAMA BARANG,PENGERJAAN,JUMLAH (QTY),TANGGAL MASUK,TANGGAL KELUAR,STATUS,KETERANGAN\n';
+      currentDisplayedData.forEach(row => {
+        csv += `"${row.noSpk}","${row.namaCostumer}","${row.namaBarang}","${row.pengerjaan}","${row.jumlahQty || '-'}","${row.tanggalMasuk || '-'}","${row.tanggalKeluar || '-'}","${row.status}","${row.keterangan || '-'}"\n`;
+      });
+
+      const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `Laporan_Bubut_${currentTab}_${getTodayFormatted()}.csv`;
+      a.click();
+    }
+
+    function exportDOC() {
+      toggleExportMenu();
+      if (!currentDisplayedData || currentDisplayedData.length === 0) {
+        alert('Tidak ada data untuk diunduh.');
+        return;
+      }
+
+      let tableHtml = `
+        <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+        <head><title>Laporan Pengerjaan Bubut</title>
+        <style>
+          body { font-family: Arial, sans-serif; }
+          table { border-collapse: collapse; width: 100%; margin-top: 15px; }
+          th, td { border: 1px solid #000; padding: 6px; font-size: 11px; text-align: left; }
+          th { background-color: #0f172a; color: #ffffff; }
+          h2 { color: #0f172a; margin-bottom: 5px; }
+        </style>
+        </head>
+        <body>
+          <h2>DODOH JAYA TEKNIK - LAPORAN WORK ORDER</h2>
+          <p>Tanggal Cetak: ${new Date().toLocaleDateString('id-ID')} | Status: ${currentTab === 'active' ? 'Pengerjaan Aktif' : 'Riwayat Selesai'}</p>
+          <table>
+            <thead>
+              <tr>
+                <th>NO SPK</th>
+                <th>NAMA CUSTOMER</th>
+                <th>NAMA BARANG</th>
+                <th>PENGERJAAN</th>
+                <th>QTY</th>
+                <th>TGL MASUK</th>
+                <th>TGL KELUAR</th>
+                <th>STATUS</th>
+                <th>KETERANGAN</th>
+              </tr>
+            </thead>
+            <tbody>
+      `;
+
+      currentDisplayedData.forEach(row => {
+        tableHtml += `
+          <tr>
+            <td><b>${row.noSpk}</b></td>
+            <td>${row.namaCostumer}</td>
+            <td>${row.namaBarang}</td>
+            <td>${row.pengerjaan}</td>
+            <td>${row.jumlahQty || '-'}</td>
+            <td>${row.tanggalMasuk || '-'}</td>
+            <td>${row.tanggalKeluar || '-'}</td>
+            <td>${row.status}</td>
+            <td>${row.keterangan || '-'}</td>
+          </tr>
+        `;
+      });
+
+      tableHtml += `
+            </tbody>
+          </table>
+        </body>
+        </html>
+      `;
+
+      const blob = new Blob(['\ufeff', tableHtml], { type: 'application/msword' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `Laporan_Bubut_${currentTab}_${getTodayFormatted()}.doc`;
+      a.click();
     }
   </script>
 </body>
