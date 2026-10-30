@@ -34,7 +34,6 @@
     .status-pulse { animation: pulseGlow 2.5s ease-in-out infinite; }
     .modal-animated { animation: modalPop 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
 
-    /* Pola latar belakang industrial subtle (garis-garis baja / strip kuning hitam hazard) */
     .industrial-pattern {
       background-color: #090d16;
       background-image: 
@@ -56,51 +55,46 @@
 <body class="bg-slate-100 min-h-screen flex flex-col justify-between text-slate-800 antialiased">
 
   <div>
-    <!-- Industrial Banner Header dengan Vektor Mesin & Las -->
+    <!-- Header Diperbaiki agar tidak tumpang tindih di HP Android -->
     <header class="industrial-pattern text-white shadow-xl sticky top-0 z-40 border-b-4 border-amber-500 relative overflow-hidden">
-      <!-- Garis Aksen Hazard Kuning Hitam di Atas Header -->
       <div class="h-1.5 w-full hazard-stripes opacity-90"></div>
 
-      <div class="max-w-7xl mx-auto px-4 py-4 flex flex-col sm:flex-row justify-between items-center gap-4 relative z-10">
+      <div class="max-w-7xl mx-auto px-4 py-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 relative z-10">
         
         <!-- Identitas Bengkel -->
-        <div class="flex items-center space-x-3.5">
-          <div class="bg-amber-500/20 p-3 rounded-2xl border border-amber-500/40 shadow-inner flex items-center justify-center">
-            <i class="fa-solid fa-gears text-2xl text-amber-400 fa-spin-slow"></i>
-          </div>
-          <div>
-            <div class="flex items-center gap-2">
-              <h1 class="text-lg sm:text-xl font-extrabold tracking-wider uppercase text-white font-mono">
-                DODOH JAYA TEKNIK
-              </h1>
-              <span class="text-[10px] bg-amber-500 text-slate-950 px-2 py-0.5 rounded font-mono font-extrabold tracking-widest shadow">WORKSHOP</span>
+        <div class="flex items-center space-x-3 w-full sm:w-auto justify-between sm:justify-start">
+          <div class="flex items-center space-x-3">
+            <div class="bg-amber-500/20 p-2.5 sm:p-3 rounded-2xl border border-amber-500/40 shadow-inner flex items-center justify-center shrink-0">
+              <i class="fa-solid fa-gears text-xl sm:text-2xl text-amber-400 fa-spin-slow"></i>
             </div>
-            <p class="text-xs text-slate-400 font-medium tracking-tight mt-0.5 flex items-center gap-2">
-              <span><i class="fa-solid fa-screwdriver-wrench text-amber-400 mr-1"></i> Bubut & Las MIG</span>
-              <span class="text-slate-600">|</span>
-              <span>Monitoring & Recording Work Order</span>
-            </p>
+            <div>
+              <div class="flex items-center gap-2 flex-wrap">
+                <h1 class="text-sm sm:text-xl font-extrabold tracking-wider uppercase text-white font-mono leading-tight">
+                  DODOH JAYA TEKNIK
+                </h1>
+                <span class="text-[9px] sm:text-[10px] bg-amber-500 text-slate-950 px-1.5 py-0.5 rounded font-mono font-extrabold tracking-widest shadow">WORKSHOP</span>
+              </div>
+              <p class="text-[11px] text-slate-400 font-medium tracking-tight mt-0.5 flex items-center gap-1.5 flex-wrap">
+                <span><i class="fa-solid fa-screwdriver-wrench text-amber-400 mr-1"></i> Bubut & Las MIG</span>
+              </p>
+            </div>
           </div>
+
+          <!-- Tombol Refresh versi Mobile (muncul di sebelah kanan atas pada HP) -->
+          <button onclick="loadData()" class="sm:hidden bg-slate-800 hover:bg-slate-700 text-slate-200 px-3 py-2 rounded-xl text-xs font-bold transition border border-slate-700 flex items-center gap-1.5 active:scale-95 shadow shrink-0">
+            <i class="fa-solid fa-rotate text-amber-400" id="refresh-icon-mobile"></i> 
+            <span>Refresh</span>
+          </button>
         </div>
 
-        <!-- Tombol Refresh & Ikon Vektor Mini Mesin/Las -->
-        <div class="flex items-center gap-3">
-          <!-- Dekorasi Vektor/Ikon SVG Representasi Mesin Bubut & Las MIG -->
-          <div class="hidden md:flex items-center gap-2 bg-slate-800/80 px-3.5 py-1.5 rounded-xl border border-slate-700 text-xs font-mono text-slate-300 shadow-inner">
-            <span class="flex items-center gap-1.5" title="Mesin Bubut Active">
-              <i class="fa-solid fa-industry text-amber-400"></i> Lathe Station
-            </span>
-            <span class="text-slate-600">/</span>
-            <span class="flex items-center gap-1.5" title="Las MIG Active">
-              <i class="fa-solid fa-fire-flame-curved text-orange-400"></i> MIG Welding
-            </span>
-          </div>
-
+        <!-- Tombol Refresh versi Tablet/Desktop -->
+        <div class="hidden sm:flex items-center gap-3 w-full sm:w-auto justify-end">
           <button onclick="loadData()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-4 py-2.5 rounded-xl text-xs font-bold transition border border-slate-700 flex items-center gap-2 active:scale-95 shadow">
             <i class="fa-solid fa-rotate text-amber-400" id="refresh-icon"></i> 
             <span>Refresh Data</span>
           </button>
         </div>
+
       </div>
     </header>
 
@@ -184,31 +178,34 @@
       <!-- Table Section -->
       <section class="lg:col-span-8 bg-white p-5 rounded-2xl shadow-sm border border-slate-200/80">
         
-        <!-- Tab Navigation, Export & Filter -->
-        <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 mb-5 border-b pb-4 border-slate-100">
-          <div class="flex bg-slate-100 p-1 rounded-xl gap-1">
-            <button onclick="switchTab('active')" id="tabActiveBtn" class="px-3.5 py-2 rounded-lg text-xs font-bold transition flex items-center gap-2 bg-white text-slate-900 shadow-sm border border-slate-200/60">
+        <!-- Tab Navigation, Export & Filter Responsive -->
+        <div class="flex flex-col gap-3 mb-5 border-b pb-4 border-slate-100">
+          
+          <!-- Tombol Tab Aktif / Riwayat -->
+          <div class="flex bg-slate-100 p-1 rounded-xl gap-1 w-full">
+            <button onclick="switchTab('active')" id="tabActiveBtn" class="flex-1 py-2 px-3 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1.5 bg-white text-slate-900 shadow-sm border border-slate-200/60">
               <i class="fa-solid fa-gears text-amber-500"></i>
-              <span>Pengerjaan Aktif</span>
+              <span>Aktif</span>
               <span id="activeCountBadge" class="bg-slate-900 text-white text-[10px] px-1.5 py-0.2 rounded-full font-mono">0</span>
             </button>
-            <button onclick="switchTab('history')" id="tabHistoryBtn" class="px-3.5 py-2 rounded-lg text-xs font-bold transition flex items-center gap-2 text-slate-500 hover:text-slate-900">
+            <button onclick="switchTab('history')" id="tabHistoryBtn" class="flex-1 py-2 px-3 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1.5 text-slate-500 hover:text-slate-900">
               <i class="fa-solid fa-clock-rotate-left"></i>
-              <span>Riwayat Selesai</span>
+              <span>Riwayat</span>
               <span id="historyCountBadge" class="bg-slate-200 text-slate-700 text-[10px] px-1.5 py-0.2 rounded-full font-mono">0</span>
             </button>
           </div>
 
-          <div class="flex items-center gap-2 w-full md:w-auto">
+          <!-- Baris Tombol Export & Search Bar agar sejajar dan fleksibel di HP -->
+          <div class="flex items-center gap-2 w-full">
             <!-- Dropdown Export Laporan -->
-            <div class="relative inline-block text-left">
-              <button onclick="toggleExportMenu()" class="bg-slate-900 hover:bg-slate-800 text-white px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-sm active:scale-95">
+            <div class="relative inline-block text-left shrink-0">
+              <button onclick="toggleExportMenu()" class="bg-slate-900 hover:bg-slate-800 text-white px-3.5 py-2.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-sm active:scale-95">
                 <i class="fa-solid fa-file-arrow-down text-amber-400"></i>
                 <span>Export</span>
                 <i class="fa-solid fa-chevron-down text-[10px] ml-0.5 text-slate-400"></i>
               </button>
               
-              <div id="exportDropdown" class="hidden absolute right-0 mt-2 w-44 bg-white rounded-xl shadow-xl border border-slate-200 z-50 overflow-hidden text-xs">
+              <div id="exportDropdown" class="hidden absolute left-0 sm:right-0 sm:left-auto mt-2 w-44 bg-white rounded-xl shadow-xl border border-slate-200 z-50 overflow-hidden text-xs">
                 <div class="px-3 py-2 bg-slate-50 border-b font-bold text-slate-400 uppercase text-[9px] tracking-wider font-mono">Format File</div>
                 <button onclick="exportPDF()" class="w-full text-left px-3.5 py-2 hover:bg-slate-50 flex items-center gap-2 font-semibold text-slate-700 border-b border-slate-100">
                   <i class="fa-solid fa-file-pdf text-rose-500 text-sm w-4"></i> PDF Laporan
@@ -226,15 +223,15 @@
             </div>
 
             <!-- Search Bar -->
-            <div class="relative flex-grow md:flex-grow-0">
+            <div class="relative flex-grow">
               <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400"><i class="fa-solid fa-magnifying-glass text-xs"></i></span>
-              <input type="text" id="searchInput" onkeyup="filterTable()" placeholder="Cari SPK / Customer..." class="pl-9 pr-3 py-2 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-slate-900 w-full md:w-44 bg-slate-50/50">
+              <input type="text" id="searchInput" onkeyup="filterTable()" placeholder="Cari SPK / Customer..." class="pl-9 pr-3 py-2.5 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-slate-900 w-full bg-slate-50/50">
             </div>
           </div>
         </div>
 
         <div class="overflow-x-auto rounded-xl border border-slate-200">
-          <table class="w-full text-left border-collapse">
+          <table class="w-full text-left border-collapse min-w-[550px]">
             <thead>
               <tr class="bg-slate-900 text-slate-300 text-[11px] font-bold uppercase tracking-wider font-mono">
                 <th class="p-3">SPK & Customer</th>
@@ -378,7 +375,9 @@
 
     function loadData() {
       const icon = document.getElementById('refresh-icon');
+      const iconMobile = document.getElementById('refresh-icon-mobile');
       if (icon) icon.classList.add('fa-spin-slow');
+      if (iconMobile) iconMobile.classList.add('fa-spin-slow');
 
       fetch(SCRIPT_URL)
         .then(res => {
@@ -390,10 +389,12 @@
           updateCounts();
           filterTable();
           if (icon) icon.classList.remove('fa-spin-slow');
+          if (iconMobile) iconMobile.classList.remove('fa-spin-slow');
         })
         .catch(err => {
           alert('Gagal memuat data. Pastikan SCRIPT_URL sudah terisi link /exec dan akses diset "Anyone": ' + err);
           if (icon) icon.classList.remove('fa-spin-slow');
+          if (iconMobile) iconMobile.classList.remove('fa-spin-slow');
         });
     }
 
@@ -403,11 +404,11 @@
       const historyBtn = document.getElementById('tabHistoryBtn');
 
       if (tab === 'active') {
-        activeBtn.className = "px-3.5 py-2 rounded-lg text-xs font-bold transition flex items-center gap-2 bg-white text-slate-900 shadow-sm border border-slate-200/60";
-        historyBtn.className = "px-3.5 py-2 rounded-lg text-xs font-bold transition flex items-center gap-2 text-slate-500 hover:text-slate-900";
+        activeBtn.className = "flex-1 py-2 px-3 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1.5 bg-white text-slate-900 shadow-sm border border-slate-200/60";
+        historyBtn.className = "flex-1 py-2 px-3 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1.5 text-slate-500 hover:text-slate-900";
       } else {
-        historyBtn.className = "px-3.5 py-2 rounded-lg text-xs font-bold transition flex items-center gap-2 bg-white text-slate-900 shadow-sm border border-slate-200/60";
-        activeBtn.className = "px-3.5 py-2 rounded-lg text-xs font-bold transition flex items-center gap-2 text-slate-500 hover:text-slate-900";
+        historyBtn.className = "flex-1 py-2 px-3 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1.5 bg-white text-slate-900 shadow-sm border border-slate-200/60";
+        activeBtn.className = "flex-1 py-2 px-3 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1.5 text-slate-500 hover:text-slate-900";
       }
 
       filterTable();
